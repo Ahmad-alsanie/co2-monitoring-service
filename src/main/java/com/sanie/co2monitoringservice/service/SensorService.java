@@ -30,7 +30,6 @@ public class SensorService {
     @Autowired
     private SensorProperties sensorProperties;
 
-    // Ensuring thread safety
     private final ConcurrentHashMap<UUID, LinkedList<Integer>> sensorMeasurements = new ConcurrentHashMap<>();
 
     @Transactional
