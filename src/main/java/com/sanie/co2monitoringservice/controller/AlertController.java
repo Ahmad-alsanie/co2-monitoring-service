@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/alerts")
+@RequestMapping("/api/v1/sensors")
 public class AlertController {
 
     @Autowired
     private AlertService alertService;
 
-    @GetMapping("/{sensorId}")
+    @GetMapping("/{sensorId}/alerts")
     public ResponseEntity<List<AlertDTO>> getAlertsForSensor(@PathVariable UUID sensorId) {
         List<AlertDTO> alerts = alertService.findAlertsForSensor(sensorId);
         return ResponseEntity.ok(alerts);
