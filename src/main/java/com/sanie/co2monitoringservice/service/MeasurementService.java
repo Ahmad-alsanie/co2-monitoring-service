@@ -20,6 +20,9 @@ public class MeasurementService {
     @Autowired
     private SensorService sensorService;
 
+    @Autowired
+    private AlertService alertService;
+
     @Transactional
     public void recordMeasurement(UUID sensorId, int co2, LocalDateTime time) {
         // Assuming a method in SensorService to fetch Sensor by ID | we can add sensors using our sensor API
@@ -34,6 +37,9 @@ public class MeasurementService {
 
         // Then call to update the sensor's status
         sensorService.updateSensorStatusAndHandleAlerts(sensorId, co2);
+
+        // check if conditions are met to clear an alert | We can replace this by scheduled method to run periodically
+        alertService.clearAlertIfConditionsMet(sensorId);
     }
 }
 

@@ -25,7 +25,7 @@ public class SensorService {
     private SensorRepository sensorRepository;
 
     @Autowired
-    private AlertRepository alertRepository;
+    private AlertService alertService;
 
     @Autowired
     private SensorProperties sensorProperties;
@@ -66,7 +66,7 @@ public class SensorService {
             sensorRepository.save(sensor);
 
             if (newStatus == Status.ALERT) {
-                generateAlert(sensor);
+                alertService.createAlert(sensor.getId(), measurements);
             }
         }
     }
@@ -82,12 +82,6 @@ public class SensorService {
         } else {
             return Status.OK;
         }
-    }
-
-    private void generateAlert(Sensor sensor) {
-        Alert alert = new Alert();
-        alert.setSensor(sensor);
-        alertRepository.save(alert);
     }
 }
 
