@@ -1,0 +1,4 @@
+sensor:
+  thresholds:
+    warnLevel: 2000
+    times: 3

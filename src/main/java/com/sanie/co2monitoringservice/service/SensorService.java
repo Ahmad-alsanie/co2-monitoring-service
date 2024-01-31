@@ -1,0 +1,85 @@
+package com.sanie.co2monitoringservice.service;
+
+import com.sanie.co2monitoringservice.configuration.SensorProperties;
+import com.sanie.co2monitoringservice.model.Alert;
+import com.sanie.co2monitoringservice.model.Sensor;
+import com.sanie.co2monitoringservice.model.Status;
+import com.sanie.co2monitoringservice.repository.AlertRepository;
+import com.sanie.co2monitoringservice.repository.SensorRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Service
+public class SensorService {
+
+    @Autowired
+    private SensorRepository sensorRepository;
+
+    @Autowired
+    private AlertRepository alertRepository;
+
+    @Autowired
+    private SensorProperties sensorProperties;
+
+    // Ensuring thread safety
+    private final ConcurrentHashMap<UUID, LinkedList<Integer>> sensorMeasurements = new ConcurrentHashMap<>();
+
+    @Transactional
+    public synchronized void updateSensorStatusAndHandleAlerts(UUID sensorId, int co2Level) {
+        int consecutiveThreshold = sensorProperties.getThresholds().getTimes();
+        Sensor sensor = sensorRepository.findById(sensorId).orElseThrow(() -> new IllegalStateException("Sensor not found"));
+        LinkedList<Integer> measurements = sensorMeasurements.computeIfAbsent(sensorId, k -> new LinkedList<>());
+
+        measurements.add(co2Level);
+        if (measurements.size() > consecutiveThreshold) {
+            measurements.removeFirst();
+        }
+
+        updateStatus(sensor, measurements);
+    }
+
+    public Optional<Sensor> findSensorById(UUID id) {
+        return sensorRepository.findById(id);
+    }
+
+    private void updateStatus(Sensor sensor, List<Integer> measurements) {
+        Status newStatus = determineStatus(measurements);
+        if (sensor.getStatus() != newStatus) {
+            sensor.setStatus(newStatus);
+            sensorRepository.save(sensor);
+
+            if (newStatus == Status.ALERT) {
+                generateAlert(sensor);
+            }
+        }
+    }
+
+    private Status determineStatus(List<Integer> measurements) {
+        int warnLevel = sensorProperties.getThresholds().getWarnLevel();
+        int consecutiveThreshold = sensorProperties.getThresholds().getTimes();
+        long aboveThreshold = measurements.stream().filter(co2 -> co2 > warnLevel).count();
+        if (aboveThreshold >= consecutiveThreshold) {
+            return Status.ALERT;
+        } else if (measurements.stream().anyMatch(co2 -> co2 > warnLevel)) {
+            return Status.WARN;
+        } else {
+            return Status.OK;
+        }
+    }
+
+    private void generateAlert(Sensor sensor) {
+        Alert alert = new Alert();
+        alert.setSensor(sensor);
+        alertRepository.save(alert);
+    }
+}
+
