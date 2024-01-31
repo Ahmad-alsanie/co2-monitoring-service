@@ -10,7 +10,7 @@ public class Sensor {
 
     @Id
     @Column(name = "SENSOR_ID")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @Column(name="STATUS")

@@ -1,17 +1,17 @@
 package com.sanie.co2monitoringservice.controller;
 
+import com.sanie.co2monitoringservice.dto.MeasurementDTO;
+import com.sanie.co2monitoringservice.dto.SensorDTO;
 import com.sanie.co2monitoringservice.model.Sensor;
 import com.sanie.co2monitoringservice.model.Status;
 import com.sanie.co2monitoringservice.service.SensorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Locale;
 import java.util.UUID;
 
 @RestController
@@ -27,5 +27,12 @@ public class SensorController {
                 .map(Sensor::getStatus)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sensor not found"));
         return ResponseEntity.ok(status);
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> recordSensor(@RequestBody SensorDTO sensorDTO) {
+        Status status = Status.valueOf(sensorDTO.getStatus().toUpperCase());
+        sensorService.recordSensor(sensorDTO.getSensorId(), status);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

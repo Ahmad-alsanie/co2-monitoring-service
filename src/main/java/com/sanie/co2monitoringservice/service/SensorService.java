@@ -47,6 +47,14 @@ public class SensorService {
         updateStatus(sensor, measurements);
     }
 
+    @Transactional
+    public void recordSensor(UUID sensorId, Status status){
+        Sensor sensor = new Sensor();
+        sensor.setId(sensorId);
+        sensor.setStatus(status);
+        sensorRepository.save(sensor);
+    }
+
     public Optional<Sensor> findSensorById(UUID id) {
         return sensorRepository.findById(id);
     }

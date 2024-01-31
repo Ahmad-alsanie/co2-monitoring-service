@@ -22,7 +22,7 @@ public class MeasurementService {
 
     @Transactional
     public void recordMeasurement(UUID sensorId, int co2, LocalDateTime time) {
-        // Assuming a method in SensorService to fetch Sensor by ID
+        // Assuming a method in SensorService to fetch Sensor by ID | we can add sensors using our sensor API
         Sensor sensor = sensorService.findSensorById(sensorId)
                 .orElseThrow(() -> new EntityNotFoundException("Sensor not found with ID: " + sensorId));
 
