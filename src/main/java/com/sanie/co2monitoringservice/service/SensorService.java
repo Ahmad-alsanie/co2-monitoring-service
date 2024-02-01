@@ -4,6 +4,7 @@ import com.sanie.co2monitoringservice.configuration.SensorProperties;
 import com.sanie.co2monitoringservice.model.Sensor;
 import com.sanie.co2monitoringservice.model.Status;
 import com.sanie.co2monitoringservice.repository.SensorRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,7 @@ public class SensorService {
     @Transactional
     public synchronized void updateSensorStatusAndHandleAlerts(UUID sensorId, int co2Level) {
         int consecutiveThreshold = sensorProperties.getThresholds().getTimes();
-        Sensor sensor = sensorRepository.findById(sensorId).orElseThrow(() -> new IllegalStateException("Sensor not found"));
+        Sensor sensor = sensorRepository.findById(sensorId).orElseThrow(() -> new EntityNotFoundException("Sensor not found"));
         LinkedList<Integer> measurements = sensorMeasurements.computeIfAbsent(sensorId, k -> new LinkedList<>());
 
         measurements.add(co2Level);

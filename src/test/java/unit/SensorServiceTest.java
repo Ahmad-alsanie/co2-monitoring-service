@@ -7,6 +7,7 @@ import com.sanie.co2monitoringservice.repository.SensorRepository;
 import com.sanie.co2monitoringservice.service.AlertService;
 import com.sanie.co2monitoringservice.service.SensorService;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,26 +28,37 @@ public class SensorServiceTest {
     private SensorRepository sensorRepository;
 
     @Mock
-    private AlertService alertService;
-
-    @Mock
     private SensorProperties sensorProperties;
 
     @InjectMocks
     private SensorService sensorService;
 
-    @Test
-    public void testUpdateSensorStatusAndHandleAlerts() {
-        UUID sensorId = UUID.randomUUID();
-        Sensor sensor = new Sensor();
+    private Sensor sensor;
+    private UUID sensorId;
+    private UUID invalidSensorId;
+
+    private final static int THRESHOLD = 2000;
+    private final static int TIMES = 3;
+
+    @BeforeEach
+    public void setup(){
+        sensorId = UUID.randomUUID();
+        invalidSensorId = UUID.randomUUID();
+        sensor = new Sensor();
         sensor.setId(sensorId);
         sensor.setStatus(Status.OK);
         SensorProperties.Thresholds thresholds = mock(SensorProperties.Thresholds.class);
         when(sensorProperties.getThresholds()).thenReturn(thresholds);
-        when(sensorRepository.findById(sensorId)).thenReturn(Optional.of(sensor));
-        when(sensorProperties.getThresholds().getWarnLevel()).thenReturn(2000);
-        when(sensorProperties.getThresholds().getTimes()).thenReturn(3);
 
+
+        when(sensorProperties.getThresholds().getTimes()).thenReturn(TIMES);
+    }
+
+    @Test
+    public void testUpdateSensorStatusAndHandleAlerts() {
+
+        when(sensorProperties.getThresholds().getWarnLevel()).thenReturn(THRESHOLD);
+        when(sensorRepository.findById(sensorId)).thenReturn(Optional.of(sensor));
         sensorService.updateSensorStatusAndHandleAlerts(sensorId, 2100);
 
         Mockito.verify(sensorRepository, times(1)).save(sensor);
@@ -54,12 +66,11 @@ public class SensorServiceTest {
 
     @Test
     public void testSensorNotFound() {
-        UUID sensorId = UUID.randomUUID();
 
-        when(sensorRepository.findById(sensorId)).thenReturn(Optional.empty());
+        when(sensorRepository.findById(invalidSensorId)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> {
-            sensorService.updateSensorStatusAndHandleAlerts(sensorId, 2100);
+            sensorService.updateSensorStatusAndHandleAlerts(invalidSensorId, 2100);
         });
     }
 }

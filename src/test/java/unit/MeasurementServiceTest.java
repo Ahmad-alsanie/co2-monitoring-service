@@ -7,6 +7,7 @@ import com.sanie.co2monitoringservice.service.AlertService;
 import com.sanie.co2monitoringservice.service.MeasurementService;
 import com.sanie.co2monitoringservice.service.SensorService;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,50 +36,57 @@ public class MeasurementServiceTest {
     @InjectMocks
     private MeasurementService measurementService;
 
+    private UUID sensorId;
+    private UUID invalidSensorId;
+    private Sensor sensor;
+
+    private static final int CO2_LEVEL = 2000;
+    private static final int CO2_LEVEL_UNDER_ALARM = 1500;
+
+    @BeforeEach
+    public void setup(){
+        sensorId = UUID.randomUUID();
+        invalidSensorId = UUID.randomUUID();
+        sensor = new Sensor();
+        sensor.setId(sensorId);
+    }
+
     @Test
     public void testRecordMeasurement() {
-        UUID sensorId = UUID.randomUUID();
-        int co2 = 2000;
         LocalDateTime time = LocalDateTime.now();
 
         Sensor sensor = new Sensor();
         sensor.setId(sensorId);
         when(sensorService.findSensorById(sensorId)).thenReturn(Optional.of(sensor));
 
-        measurementService.recordMeasurement(sensorId, co2, time);
+        measurementService.recordMeasurement(sensorId, CO2_LEVEL, time);
 
         verify(measurementRepository, times(1)).save(any(Measurement.class));
-        verify(sensorService, times(1)).updateSensorStatusAndHandleAlerts(sensorId, co2);
+        verify(sensorService, times(1)).updateSensorStatusAndHandleAlerts(sensorId, CO2_LEVEL);
         verify(alertService, times(1)).clearAlertIfConditionsMet(sensorId);
     }
 
     @Test
     public void testSensorNotFound() {
-        UUID sensorId = UUID.randomUUID();
-        int co2 = 2000;
         LocalDateTime time = LocalDateTime.now();
-        when(sensorService.findSensorById(sensorId)).thenReturn(Optional.empty());
+        when(sensorService.findSensorById(invalidSensorId)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> {
-            measurementService.recordMeasurement(sensorId, co2, time);
+            measurementService.recordMeasurement(invalidSensorId, CO2_LEVEL, time);
         });
     }
 
     @Test
     public void testNoAlertConditionMet() {
-        UUID sensorId = UUID.randomUUID();
-        Sensor sensor = new Sensor();
-        sensor.setId(sensorId);
-        int co2LevelNotTriggeringAlert = 1500;
         LocalDateTime time = LocalDateTime.now();
 
         when(sensorService.findSensorById(sensorId)).thenReturn(Optional.of(sensor));
 
-        measurementService.recordMeasurement(sensorId, co2LevelNotTriggeringAlert, time);
+        measurementService.recordMeasurement(sensorId, CO2_LEVEL_UNDER_ALARM, time);
 
         verify(measurementRepository, times(1)).save(any(Measurement.class));
 
-        verify(sensorService, times(1)).updateSensorStatusAndHandleAlerts(sensorId, co2LevelNotTriggeringAlert);
+        verify(sensorService, times(1)).updateSensorStatusAndHandleAlerts(sensorId, CO2_LEVEL_UNDER_ALARM);
 
         verify(alertService, times(1)).clearAlertIfConditionsMet(sensorId);
 
@@ -87,8 +95,6 @@ public class MeasurementServiceTest {
 
     @Test
     public void testMeasurementSaveFailure() {
-        UUID sensorId = UUID.randomUUID();
-        int co2 = 2000;
         LocalDateTime time = LocalDateTime.now();
 
         Sensor sensor = new Sensor();
@@ -97,6 +103,6 @@ public class MeasurementServiceTest {
 
         doThrow(new RuntimeException("Database error")).when(measurementRepository).save(any(Measurement.class));
 
-        assertThrows(RuntimeException.class, () -> measurementService.recordMeasurement(sensorId, co2, time));
+        assertThrows(RuntimeException.class, () -> measurementService.recordMeasurement(sensorId, CO2_LEVEL, time));
     }
 }
