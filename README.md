@@ -1,5 +1,5 @@
 ## CO2 Monitoring Service
-service for collecting data from sensors and publish metrics if the CO2 concentrations reach critical levels
+A service for collecting data from sensors and publish metrics depending on the CO2 concentrations levels
 
 ### Table of Contents
 - [Setup & Run Instructions](#Setup-&-Run-Instructions)
@@ -44,13 +44,17 @@ docker run -p 8080:8080 -d sanie/co2-monitoring-service
 
 ### Testing
 For your convenience and aside from the implemented unit and integration tests, you can play around with the curls below or use postMan to perform some requests.
+
 1- Add a sensor
+
 ```shell
 curl -X POST http://localhost:8080/api/v1/sensors \
      -H "Content-Type: application/json" \
      -d '{"sensorId": "f31aa992-4ea0-4900-a59f-9e862cc4114f", "status": "OK"}'
 ```
+
 2- Add three consecutive above threshold measures to trigger an alert
+
 ```shell
 curl -X POST http://localhost:8080/api/v1/measurements \
      -H "Content-Type: application/json" \
@@ -65,7 +69,9 @@ curl -X POST http://localhost:8080/api/v1/measurements \
      -d '{"sensorId": "f31aa992-4ea0-4900-a59f-9e862cc4114f", "co2Level": 2003}'
 
 ```
+
 3- Navigate to [Sensor-status](http://localhost:8080/api/v1/sensors/f31aa992-4ea0-4900-a59f-9e862cc4114f/status) to view your sensor
+
 4- Navigate to [Alerts](http://localhost:8080/api/v1/sensors/f31aa992-4ea0-4900-a59f-9e862cc4114f/alerts) to view current alerts
 
 Note: DB can be accessed at [h2-db](http://localhost:8080/h2-console)
