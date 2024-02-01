@@ -10,7 +10,7 @@ public class Sensor {
 
     @Id
     @Column(name = "SENSOR_ID")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    // @GeneratedValue(strategy = GenerationType.AUTO) for now I want to allow users to set the uuid manually for sensors using sensor API
     private UUID id;
 
     @Column(name="STATUS")
