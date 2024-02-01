@@ -1,6 +1,5 @@
 package com.sanie.co2monitoringservice.controller;
 
-import com.sanie.co2monitoringservice.dto.MeasurementDTO;
 import com.sanie.co2monitoringservice.dto.SensorDTO;
 import com.sanie.co2monitoringservice.model.Sensor;
 import com.sanie.co2monitoringservice.model.Status;
@@ -11,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Locale;
 import java.util.UUID;
 
 @RestController
