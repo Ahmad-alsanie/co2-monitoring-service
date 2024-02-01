@@ -2,6 +2,9 @@ package com.sanie.co2monitoringservice.configuration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Export configurations for threshold to yaml
+ * */
 @Configuration
 @ConfigurationProperties(prefix = "sensor")
 public class SensorProperties {

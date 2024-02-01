@@ -72,6 +72,11 @@ public class AlertService {
         }
     }
 
+    /**
+     * find all alerts associated with the sensor.
+     *
+     * @param sensorId The UUID of the sensor.
+     */
     public List<AlertDTO> findAlertsForSensor(UUID sensorId) {
         List<Alert> alerts = alertRepository.findBySensorId(sensorId);
         return alerts.stream().map(this::convertToDTO).collect(Collectors.toList());

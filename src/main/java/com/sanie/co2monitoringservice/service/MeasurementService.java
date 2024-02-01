@@ -23,6 +23,13 @@ public class MeasurementService {
     @Autowired
     private AlertService alertService;
 
+    /**
+     * Records a measurement.
+     *
+     * @param sensorId The UUID of the sensor.
+     * @param co2 The list of consecutive measurements triggering the alert.
+     * @param time timestamp of measurement
+     */
     @Transactional
     public void recordMeasurement(UUID sensorId, int co2, LocalDateTime time) {
         // Assuming a method in SensorService to fetch Sensor by ID | we can add sensors using our sensor API

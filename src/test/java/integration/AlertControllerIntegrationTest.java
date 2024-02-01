@@ -62,7 +62,6 @@ public class AlertControllerIntegrationTest {
         UUID sensorWithNoAlerts = UUID.randomUUID();
 
         mockMvc.perform(get("/api/v1/sensors/" + sensorWithNoAlerts + "/alerts"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(status().isNoContent());
     }
 }

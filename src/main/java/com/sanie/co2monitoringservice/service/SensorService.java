@@ -1,10 +1,8 @@
 package com.sanie.co2monitoringservice.service;
 
 import com.sanie.co2monitoringservice.configuration.SensorProperties;
-import com.sanie.co2monitoringservice.model.Alert;
 import com.sanie.co2monitoringservice.model.Sensor;
 import com.sanie.co2monitoringservice.model.Status;
-import com.sanie.co2monitoringservice.repository.AlertRepository;
 import com.sanie.co2monitoringservice.repository.SensorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +30,12 @@ public class SensorService {
 
     private final ConcurrentHashMap<UUID, LinkedList<Integer>> sensorMeasurements = new ConcurrentHashMap<>();
 
+    /**
+     * Updates sensor status and handles Alerts
+     *
+     * @param sensorId The UUID of the sensor.
+     * @param co2Level The current co2 level
+     */
     @Transactional
     public synchronized void updateSensorStatusAndHandleAlerts(UUID sensorId, int co2Level) {
         int consecutiveThreshold = sensorProperties.getThresholds().getTimes();
@@ -46,6 +50,12 @@ public class SensorService {
         updateStatus(sensor, measurements);
     }
 
+    /**
+     * Adds a sensor.
+     *
+     * @param sensorId The UUID of the sensor.
+     * @param status The Sensor status - OK, WARN, ALERT).
+     */
     @Transactional
     public void recordSensor(UUID sensorId, Status status){
         Sensor sensor = new Sensor();
@@ -54,6 +64,11 @@ public class SensorService {
         sensorRepository.save(sensor);
     }
 
+    /**
+     * Returns a sensor for the passed id.
+     *
+     * @param id The UUID of the sensor.
+     */
     public Optional<Sensor> findSensorById(UUID id) {
         return sensorRepository.findById(id);
     }

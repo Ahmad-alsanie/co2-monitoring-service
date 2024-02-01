@@ -22,6 +22,9 @@ public class AlertController {
     @GetMapping("/{sensorId}/alerts")
     public ResponseEntity<List<AlertDTO>> getAlertsForSensor(@PathVariable UUID sensorId) {
         List<AlertDTO> alerts = alertService.findAlertsForSensor(sensorId);
+        if(alerts.size() == 0){
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(alerts);
     }
 }
