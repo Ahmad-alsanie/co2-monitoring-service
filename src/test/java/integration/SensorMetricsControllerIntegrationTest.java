@@ -47,7 +47,7 @@ public class SensorMetricsControllerIntegrationTest {
     }
 
     @Test
-    public void testGetAlertsForSensorWithAlerts() throws Exception {
+    public void testGetMetricsForLastThirtyDaysWhenValidSensorCalculateAvgAndMax() throws Exception {
 
         mockMvc.perform(get("/api/v1/sensors/" + validSensorId + "/metrics"))
                 .andExpect(status().isOk())
@@ -56,7 +56,7 @@ public class SensorMetricsControllerIntegrationTest {
     }
 
     @Test
-    public void testGetAlertsForSensorWithNoAlerts() throws Exception {
+    public void testGetMetricsForInvalidSensor() throws Exception {
         UUID sensorWithNoMetrics = UUID.randomUUID();
 
         mockMvc.perform(get("/api/v1/sensors" + sensorWithNoMetrics + "/metrics"))
