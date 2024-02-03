@@ -116,4 +116,4 @@ Please note that my choices were heavily influenced by my previous experience bu
 - Adjust the returned http status code to be more descriptive and meaningful
 
 
-Happy coding! [atmospheric](https://xkcd.com/)
+Happy coding!
