@@ -79,17 +79,17 @@ Note: DB can be accessed at [h2-db](http://localhost:8080/h2-console)
 ### API Documentation
 Navigate to [Swagger API documentation](http://localhost:8080/swagger-ui/index.html) to view swagger documentation of `alerts`, `sensor` and `measurments` endpoints.
 
-| API         | supported methods | onSuccess | onFailure |
-|-------------|-------------------|-----------|-----------|
-| Measurement | POST              | 201       | 404       | 
-| Sensor      | GET & POST        | 200 & 201 | 404       | 
-| Alert       | GET               | 200       | 204       | 
-
+| API         | supported methods | onSuccess   | onFailure |
+|-------------|-------------------|-------------|-----------|
+| Measurement | POST              | 201         | 404       | 
+| Sensor      | GET & POST        | 200 & 201   | 404       | 
+| Alert       | GET               | 200         | 204       | 
+ | Metrics     | GET               | 200         | 404       |
 
 
 ### Architecture
 Key components of our service:
-- Controller: serves as the entry point for HTTP requests and handles Restful endpoints ```measurements```, ```alerts``` and ```sensors```
+- Controller: serves as the entry point for HTTP requests and handles Restful endpoints ```measurements```,```metrics``` , ```alerts``` and ```sensors```
 - Service: contains the core business logic, manages the storage and process events
 - Repository: hosts our DAOs for robust data handling capabilities while keeping the domain logic clean and decoupled from the persistence layer
 - Model: contains a representation of our main entities ```Alert```, ```Measurement```, ```Sensor``` and ```Status```
