@@ -114,3 +114,6 @@ Please note that my choices were heavily influenced by my previous experience bu
 - Rate limiting the API not to allow abuse
 - Handle concurrent requests and ensure thread safety
 - Adjust the returned http status code to be more descriptive and meaningful
+
+
+Happy coding! [atmospheric](https://xkcd.com/)
