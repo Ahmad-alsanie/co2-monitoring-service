@@ -4,6 +4,7 @@ import com.sanie.co2monitoringservice.configuration.SensorProperties;
 import com.sanie.co2monitoringservice.model.Sensor;
 import com.sanie.co2monitoringservice.model.Status;
 import com.sanie.co2monitoringservice.repository.SensorRepository;
+import com.sanie.co2monitoringservice.repository.SensorStateRepository;
 import com.sanie.co2monitoringservice.service.AlertService;
 import com.sanie.co2monitoringservice.service.SensorService;
 import jakarta.persistence.EntityNotFoundException;
@@ -39,6 +40,9 @@ public class SensorServiceTest {
     @Mock
     private AlertService alertService;
 
+    @Mock
+    private SensorStateRepository sensorStateRepository;
+
     private Sensor sensor;
     private UUID sensorId;
     private UUID invalidSensorId;
@@ -56,13 +60,15 @@ public class SensorServiceTest {
         SensorProperties.Thresholds thresholds = mock(SensorProperties.Thresholds.class);
         when(sensorProperties.getThresholds()).thenReturn(thresholds);
         lenient().when(sensorProperties.getThresholds().getWarnLevel()).thenReturn(THRESHOLD);
-        when(sensorProperties.getThresholds().getTimes()).thenReturn(TIMES);
+        lenient().when(sensorProperties.getThresholds().getTimes()).thenReturn(TIMES);
     }
 
     @Test
     public void testUpdateSensorStatusAndHandleAlerts() {
 
         when(sensorRepository.findById(sensorId)).thenReturn(Optional.of(sensor));
+        when(sensorStateRepository.getMeasurements(sensorId)).thenReturn(Arrays.asList(2100));
+
         sensorService.updateSensorStatusAndHandleAlerts(sensorId, 2100);
 
         Mockito.verify(sensorRepository, times(1)).save(sensor);

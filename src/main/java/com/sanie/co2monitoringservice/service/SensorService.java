@@ -14,9 +14,7 @@ import java.util.UUID;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class SensorService {
@@ -41,11 +39,9 @@ public class SensorService {
      */
     @Transactional
     public synchronized void updateSensorStatusAndHandleAlerts(UUID sensorId, int co2Level) {
-        sensorStateRepository.addMeasurement(sensorId, co2Level);
         Sensor sensor = sensorRepository.findById(sensorId).orElseThrow(() -> new EntityNotFoundException("Sensor not found"));
+        sensorStateRepository.addMeasurement(sensorId, co2Level);
         List<Integer> measurements = sensorStateRepository.getMeasurements(sensorId);
-
-        measurements.add(co2Level);
 
         updateStatus(sensor, measurements);
     }
