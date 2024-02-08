@@ -98,7 +98,15 @@ Key components of our service:
 - Tests: we have both unit tests under [unit](./src/test/java/unit) and [integration](./src/test/java/integration) covering all edge cases and providing assurance
 
 ### Design Decisions
-Please note that my choices were heavily influenced by my previous experience but also kept in mind system design best practices making sure to cover functional and non-functional requirements.
+Based on the following functional requirements:
+1. If the CO2 level exceeds 2000 ppm the sensor status should be set to WARN
+2. If the service receives 3 or more consecutive measurements higher than 2000  the sensor status should be set to ALERT
+3. When the sensor reaches to status ALERT an alert should be stored
+4. When the sensor reaches to status ALERT it stays in this state until it receives 3 consecutive measurements lower than 2000; then it moves to OK
+5. The service should provide the following metrics about each sensor:
+   ◦ Average CO2 level for the last 30 days
+   ◦ Maximum CO2 Level in the last 30 day
+6. It is possible to list all the alerts for a given sensor
 
 #### Choice of Technology
 - Spring Boot for rapid development features and simplifies the creation of stand-alone, production ready microservices with its autoconfigured components & IOC container.
@@ -114,6 +122,11 @@ Please note that my choices were heavily influenced by my previous experience bu
 - Rate limiting the API not to allow abuse
 - Handle concurrent requests and ensure thread safety
 - Adjust the returned http status code to be more descriptive and meaningful
+- The service cannot scale horizontally due to SensorStateRepository using in memory DS. This can be easily replaced with a distributed storage system that can be accessed and modified by all service instances. This could be a distributed cache (like Redis, Hazelcast), a database (SQL or NoSQL), or another form of shared storage that ensures consistency and availability of data across instances.
 
+### Out of scope 
+Decoupling the `SensorService` and `MeasurementService` from `AlertService` and `SensorService` requires a design approach that allows the sensor status update logic to function independently of alert notification concerns and sensor concerns. 
+This can be achieved using event-driven architecture. Events to be published whenever a sensor status changes to ALERT, and any interested parties can listen to these events and act accordingly. This decouples the sensor status management from the alerting mechanism.
+Implementing events is out of scope of this service and not a requirement.
 
 Happy coding!
