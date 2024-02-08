@@ -74,8 +74,8 @@ public class SensorService {
         return sensorRepository.findById(id);
     }
 
-    private void updateStatus(Sensor sensor, List<Integer> measurements) {
-        Status newStatus = determineStatus(measurements);
+    public void updateStatus(Sensor sensor, List<Integer> measurements) {
+        Status newStatus = determineStatus(measurements, sensor.getStatus());
         if (sensor.getStatus() != newStatus) {
             sensor.setStatus(newStatus);
             sensorRepository.save(sensor);
@@ -86,17 +86,18 @@ public class SensorService {
         }
     }
 
-    private Status determineStatus(List<Integer> measurements) {
+    public Status determineStatus(List<Integer> measurements, Status previousStatus) {
         int warnLevel = sensorProperties.getThresholds().getWarnLevel();
         int consecutiveThreshold = sensorProperties.getThresholds().getTimes();
         long aboveThreshold = measurements.stream().filter(co2 -> co2 > warnLevel).count();
         if (aboveThreshold >= consecutiveThreshold) {
             return Status.ALERT;
-        } else if (measurements.stream().anyMatch(co2 -> co2 > warnLevel)) {
+        } else if (measurements.get(measurements.size()-1) > warnLevel && previousStatus != Status.ALERT) {
             return Status.WARN;
-        } else {
+        } else if (previousStatus != Status.ALERT){
             return Status.OK;
         }
+        return Status.ALERT;
     }
 }
 
